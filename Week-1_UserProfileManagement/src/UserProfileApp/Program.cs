@@ -31,8 +31,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Add MVC Controllers & Views
-builder.Services.AddControllersWithViews();
+// Add MVC Controllers & Views with Runtime Compilation for immediate UI refresh
+var mvcBuilder = builder.Services.AddControllersWithViews();
+#if DEBUG
+mvcBuilder.AddRazorRuntimeCompilation();
+#endif
 
 var app = builder.Build();
 
