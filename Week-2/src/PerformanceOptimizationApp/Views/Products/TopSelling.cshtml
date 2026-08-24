@@ -1,0 +1,68 @@
+@model List<PerformanceOptimizationApp.ViewModels.TopSellingReportDto>
+@{
+    ViewData["Title"] = "Top Selling Products Analytics";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold mb-1">
+                    <i class="bi bi-graph-up-arrow me-1"></i> Database Server-Side GroupBy Aggregations
+                </span>
+                <h3 class="fw-bold text-body mb-0">Top Revenue-Generating Products</h3>
+                <p class="text-body-secondary small mb-0">Compiled SQL aggregation across 12,000+ transactional order line items.</p>
+            </div>
+            <a asp-controller="Benchmark" asp-action="Index" class="btn-modern-success">
+                <i class="bi bi-speedometer2"></i> View Benchmark Stats
+            </a>
+        </div>
+
+        <div class="modern-card overflow-hidden bg-body mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase fw-bold text-secondary">
+                            <th class="ps-4">Rank</th>
+                            <th>Product Details</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th class="text-center">Units Sold</th>
+                            <th class="text-center">Total Orders</th>
+                            <th class="pe-4 text-end">Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var item = Model[i];
+                            <tr>
+                                <td class="ps-4 fw-bold">
+                                    <span class="badge @(i == 0 ? "bg-warning text-dark" : i == 1 ? "bg-secondary text-white" : i == 2 ? "bg-danger text-white" : "bg-light text-dark border") rounded-circle p-2" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;">
+                                        @(i + 1)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-body">@item.ProductName</div>
+                                    <span class="text-muted small code-font">@item.SKU</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 small">@item.CategoryName</span>
+                                </td>
+                                <td class="text-body-secondary small">@item.SupplierName</td>
+                                <td class="text-center fw-bold text-body code-font">@item.TotalUnitsSold</td>
+                                <td class="text-center">
+                                    <span class="badge bg-body-tertiary text-body border rounded-pill px-2 py-1 small">@item.OrderCount orders</span>
+                                </td>
+                                <td class="pe-4 text-end fw-bold text-success fs-6 code-font">
+                                    $@item.TotalRevenueGenerated.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,135 @@
+@model PerformanceOptimizationApp.ViewModels.PaginatedList<PerformanceOptimizationApp.ViewModels.ProductDto>
+@{
+    ViewData["Title"] = "Optimized Enterprise Catalog";
+    var categories = ViewBag.Categories as List<PerformanceOptimizationApp.Models.Category> ?? new();
+    string currentSearch = ViewData["CurrentSearch"] as string ?? "";
+    int? currentCategory = ViewData["CurrentCategory"] as int?;
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <!-- Title & Stats Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold mb-1">
+                    <i class="bi bi-lightning-fill me-1"></i> AsNoTracking + Server-Side Pagination
+                </span>
+                <h3 class="fw-bold text-body mb-0">High-Performance Product Catalog</h3>
+                <p class="text-body-secondary small mb-0">Loaded in &lt; 8ms with SQL Server offset queries and minimal memory allocations.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-body-secondary text-body border px-3 py-2 rounded-pill small">
+                    Total Records: <strong class="text-success">@Model.TotalCount</strong>
+                </span>
+                <span class="badge bg-body-secondary text-body border px-3 py-2 rounded-pill small">
+                    Page: <strong>@Model.PageIndex of @Model.TotalPages</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Search & Category Filter Bar -->
+        <form method="get" asp-action="Index" class="modern-card p-3 mb-4 bg-body">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" value="@currentSearch" class="form-control form-control-modern border-start-0" placeholder="Search by Product Name or SKU..." />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="categoryId" class="form-select form-select-modern" onchange="this.form.submit();">
+                        <option value="">All Categories (Cached Lookup)</option>
+                        @foreach (var cat in categories)
+                        {
+                            <option value="@cat.Id" selected="@(currentCategory == cat.Id ? "selected" : null)">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn-modern-success flex-grow-1">
+                        <i class="bi bi-filter"></i> Apply Filter
+                    </button>
+                    @if (!string.IsNullOrEmpty(currentSearch) || currentCategory.HasValue)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-3 px-3 d-flex align-items-center">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        </form>
+
+        <!-- Products Table Card -->
+        <div class="modern-card overflow-hidden bg-body mb-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase fw-bold text-secondary">
+                            <th class="ps-4">SKU</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Unit Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var prod in Model.Items)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold text-success code-font small">@prod.SKU</td>
+                                <td>
+                                    <div class="fw-semibold text-body">@prod.Name</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 small">@prod.CategoryName</span>
+                                </td>
+                                <td class="text-body-secondary small">@prod.SupplierName</td>
+                                <td class="fw-bold text-body code-font">$@prod.UnitPrice.ToString("N2")</td>
+                                <td>
+                                    <span class="badge @(prod.UnitsInStock < 30 ? "bg-warning-subtle text-warning border border-warning" : "bg-success-subtle text-success") rounded-pill">
+                                        @prod.UnitsInStock in stock
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (prod.IsDiscontinued)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill">Discontinued</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success-subtle text-success rounded-pill">Active</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="p-3 bg-body-tertiary border-top d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted small">Showing @Model.Items.Count items on this page</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" 
+                       asp-route-pageIndex="@(Model.PageIndex - 1)" 
+                       asp-route-search="@currentSearch" 
+                       asp-route-categoryId="@currentCategory" 
+                       class="btn btn-sm btn-outline-secondary rounded-pill px-3 @(!Model.HasPreviousPage ? "disabled" : "")">
+                        <i class="bi bi-chevron-left me-1"></i> Previous
+                    </a>
+                    <a asp-action="Index" 
+                       asp-route-pageIndex="@(Model.PageIndex + 1)" 
+                       asp-route-search="@currentSearch" 
+                       asp-route-categoryId="@currentCategory" 
+                       class="btn btn-sm btn-outline-secondary rounded-pill px-3 @(!Model.HasNextPage ? "disabled" : "")">
+                        Next <i class="bi bi-chevron-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

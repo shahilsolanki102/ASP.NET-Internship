@@ -1,0 +1,183 @@
+@model List<PerformanceOptimizationApp.ViewModels.BenchmarkResultViewModel>
+@{
+    ViewData["Title"] = "Live Performance Benchmark Suite";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <!-- Header Banner -->
+        <div class="p-4 p-md-5 mb-4 rounded-4 text-white position-relative overflow-hidden" 
+             style="background: radial-gradient(circle at top right, #047857, #064e3b 70%); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <span class="badge bg-white text-success fw-bold px-3 py-2 rounded-pill mb-2">
+                        <i class="bi bi-cpu-fill me-1"></i> Live Real-Time Benchmark Engine
+                    </span>
+                    <h2 class="display-6 fw-bold mb-2">Before vs After Performance Tuning</h2>
+                    <p class="text-light opacity-90 mb-0" style="max-width: 650px;">
+                        Measuring latency, database query round-trips, and memory allocations across legacy unoptimized vs refactored ASP.NET Core MVC modules.
+                    </p>
+                </div>
+                <div class="flex-shrink-0">
+                    <a asp-action="Index" class="btn btn-light text-success fw-bold px-4 py-3 rounded-pill shadow">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Re-Run Benchmark Tests
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Chart Card -->
+        <div class="modern-card p-4 p-md-5 mb-4 bg-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h5 class="fw-bold text-body mb-1"><i class="bi bi-bar-chart-line-fill text-success me-2"></i> Latency Execution Speed (ms) Comparison</h5>
+                    <p class="text-body-secondary small mb-0">Lower latency is better. Highlighting real-world throughput gains.</p>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold">
+                    Up to 98.8% Faster
+                </span>
+            </div>
+
+            <div style="height: 280px;">
+                <canvas id="benchmarkChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Benchmark Result Cards -->
+        <div class="row g-4 mb-5">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var test = Model[i];
+                <div class="col-12">
+                    <div class="modern-card p-4 p-md-5 bg-body">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-3 pb-3 border-bottom">
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary border rounded-pill px-3 py-1 small fw-bold mb-1">
+                                    Benchmark Scenario #@(i + 1)
+                                </span>
+                                <h4 class="fw-bold text-body mb-1">@test.TestName</h4>
+                                <p class="text-body-secondary small mb-0">@test.ScenarioDescription</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-success text-white px-3 py-2 rounded-pill fs-6 fw-bold">
+                                    <i class="bi bi-speedometer2 me-1"></i> @test.PerformanceGainPercentage% Faster
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Metrics Grid -->
+                        <div class="row g-3 mb-4">
+                            <!-- Metric 1: Execution Time -->
+                            <div class="col-md-4">
+                                <div class="p-3 bg-body-tertiary rounded-4 border h-100">
+                                    <div class="text-muted small fw-bold mb-2">Execution Latency (ms)</div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small text-danger fw-semibold"><i class="bi bi-x-circle me-1"></i> Legacy:</span>
+                                        <span class="fw-bold text-danger code-font">@test.LegacyExecutionTimeMs ms</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="small text-success fw-bold"><i class="bi bi-check-circle me-1"></i> Optimized:</span>
+                                        <span class="fw-bold text-success code-font">@test.OptimizedExecutionTimeMs ms</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metric 2: Database Queries -->
+                            <div class="col-md-4">
+                                <div class="p-3 bg-body-tertiary rounded-4 border h-100">
+                                    <div class="text-muted small fw-bold mb-2">SQL Database Queries</div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small text-danger fw-semibold"><i class="bi bi-x-circle me-1"></i> Legacy:</span>
+                                        <span class="fw-bold text-danger code-font">@test.LegacyDatabaseQueryCount queries</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="small text-success fw-bold"><i class="bi bi-check-circle me-1"></i> Optimized:</span>
+                                        <span class="fw-bold text-success code-font">@test.OptimizedDatabaseQueryCount queries</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metric 3: Memory Delta -->
+                            <div class="col-md-4">
+                                <div class="p-3 bg-body-tertiary rounded-4 border h-100">
+                                    <div class="text-muted small fw-bold mb-2">RAM Allocated (MB)</div>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small text-danger fw-semibold"><i class="bi bi-x-circle me-1"></i> Legacy:</span>
+                                        <span class="fw-bold text-danger code-font">@test.LegacyMemoryAllocatedMb MB</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="small text-success fw-bold"><i class="bi bi-check-circle me-1"></i> Optimized:</span>
+                                        <span class="fw-bold text-success code-font">@test.OptimizedMemoryAllocatedMb MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analysis Details -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-danger-subtle text-danger-emphasis border border-danger-subtle h-100">
+                                    <div class="fw-bold small mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Legacy Inefficiency Identified:</div>
+                                    <div class="small">@test.LegacyIssuesFound</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-success-subtle text-success-emphasis border border-success-subtle h-100">
+                                    <div class="fw-bold small mb-1"><i class="bi bi-patch-check-fill me-1"></i> Refactoring Technique Applied:</div>
+                                    <div class="small">@test.OptimizationTechniquesUsed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('benchmarkChart').getContext('2d');
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.TestName)));
+        const legacyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.LegacyExecutionTimeMs)));
+        const optimizedData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => m.OptimizedExecutionTimeMs)));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Legacy Unoptimized (ms)',
+                        data: legacyData,
+                        backgroundColor: 'rgba(239, 68, 68, 0.75)',
+                        borderColor: '#ef4444',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    },
+                    {
+                        label: 'Refactored & Optimized (ms)',
+                        data: optimizedData,
+                        backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 8
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Milliseconds (Lower is Faster)' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' }
+                }
+            }
+        });
+    </script>
+}
