@@ -1,0 +1,76 @@
+@model UserProfileApp.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="custom-card p-4 p-md-5 my-3">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 rounded-circle bg-primary-subtle text-primary mb-2">
+                    <i class="bi bi-person-circle fs-2"></i>
+                </div>
+                <h4 class="fw-bold mb-1">Welcome Back</h4>
+                <p class="text-muted small">Sign in to manage your profile and account settings.</p>
+            </div>
+
+            <!-- Demo Credentials Helper Box -->
+            <div class="alert alert-light border rounded-3 p-3 mb-3 small">
+                <div class="fw-bold text-secondary mb-1"><i class="bi bi-info-circle me-1"></i> Demo Credentials:</div>
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Email: <code>shahil@intern.com</code></span>
+                    <span>Pass: <code>User@123</code></span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Admin: <code>admin@yuva.com</code></span>
+                    <span>Pass: <code>Admin@123</code></span>
+                </div>
+            </div>
+
+            <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-3 small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com" autofocus />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label fw-semibold"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label small text-muted"></label>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-gradient py-2 rounded-pill fw-semibold">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                    </button>
+                </div>
+
+                <div class="text-center text-muted small">
+                    Don't have an account yet? 
+                    <a asp-action="Register" class="text-primary fw-semibold text-decoration-none">Create Account</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,148 @@
+@model UserProfileApp.ViewModels.EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Edit Your Profile</h3>
+                <p class="text-muted mb-0">Update your public information, avatar, and contact details.</p>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to Profile
+            </a>
+        </div>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="custom-card p-4 p-md-5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="Username" />
+            <input type="hidden" asp-for="CurrentProfilePictureUrl" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4"></div>
+
+            <!-- 1. Profile Picture Upload Section -->
+            <div class="p-4 bg-light rounded-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-image text-primary"></i> Profile Photo
+                </h5>
+                <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
+                    <div class="position-relative">
+                        <img id="avatarPreview" src="@Model.CurrentProfilePictureUrl" alt="Avatar Preview" 
+                             class="rounded-circle shadow border border-3 border-white bg-white" 
+                             style="width: 110px; height: 110px; object-fit: cover;"
+                             onerror="this.src='/images/default-avatar.png'" />
+                    </div>
+                    <div class="flex-grow-1">
+                        <label asp-for="ProfilePictureFile" class="form-label fw-semibold">Choose New Photo</label>
+                        <input asp-for="ProfilePictureFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this);" />
+                        <div class="form-text text-muted small mt-1">
+                            Supported formats: JPG, PNG, WebP &bull; Max file size: 2MB.
+                        </div>
+                        <span asp-validation-for="ProfilePictureFile" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Basic Information Section -->
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-person text-primary"></i> Basic Information
+            </h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="FullName" class="form-label fw-semibold"></label>
+                    <input asp-for="FullName" class="form-control rounded-3" placeholder="Enter your full name" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label fw-semibold"></label>
+                    <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="name@example.com" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+                    <input asp-for="PhoneNumber" class="form-control rounded-3" placeholder="+91 98765 43210" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DateOfBirth" class="form-label fw-semibold"></label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control rounded-3" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Gender" class="form-label fw-semibold"></label>
+                    <select asp-for="Gender" class="form-select rounded-3">
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Non-Binary">Non-Binary</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger small"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Bio" class="form-label fw-semibold"></label>
+                    <textarea asp-for="Bio" rows="3" class="form-control rounded-3" placeholder="Tell us a little bit about yourself, skills, or role..."></textarea>
+                    <span asp-validation-for="Bio" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- 3. Address & Location Section -->
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-geo-alt text-primary"></i> Address & Location
+            </h5>
+            <div class="row g-3 mb-4">
+                <div class="col-12">
+                    <label asp-for="Address" class="form-label fw-semibold"></label>
+                    <input asp-for="Address" class="form-control rounded-3" placeholder="Apartment, suite, street address" />
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="City" class="form-label fw-semibold"></label>
+                    <input asp-for="City" class="form-control rounded-3" placeholder="City" />
+                    <span asp-validation-for="City" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="State" class="form-label fw-semibold"></label>
+                    <input asp-for="State" class="form-control rounded-3" placeholder="State / Province" />
+                    <span asp-validation-for="State" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Country" class="form-label fw-semibold"></label>
+                    <input asp-for="Country" class="form-control rounded-3" placeholder="Country" />
+                    <span asp-validation-for="Country" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="PostalCode" class="form-label fw-semibold"></label>
+                    <input asp-for="PostalCode" class="form-control rounded-3" placeholder="ZIP / Postal Code" />
+                    <span asp-validation-for="PostalCode" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a asp-action="Index" class="btn btn-light rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-gradient rounded-pill px-5">
+                    <i class="bi bi-check2-circle me-1"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}

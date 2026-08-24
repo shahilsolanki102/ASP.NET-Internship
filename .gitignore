@@ -1,0 +1,17 @@
+## Build and IDE Artifacts
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+appsettings.Development.json
+
+## Uploaded Files (Optional)
+wwwroot/uploads/profiles/*
+!wwwroot/uploads/profiles/.gitkeep
+
+## OS Specific
+.DS_Store
+Thumbs.db
