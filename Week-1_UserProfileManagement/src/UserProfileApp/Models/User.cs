@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UserProfileApp.Models
 {
@@ -26,11 +25,18 @@ namespace UserProfileApp.Models
 
         public bool IsActive { get; set; } = true;
 
+        public bool TwoFactorEnabled { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? LastLoginAt { get; set; }
 
-        // Navigation property
+        [MaxLength(50)]
+        public string? LastLoginIp { get; set; }
+
+        // Navigation properties
         public virtual UserProfile? UserProfile { get; set; }
+        public virtual ICollection<UserActivityLog> ActivityLogs { get; set; } = new List<UserActivityLog>();
+        public virtual ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
     }
 }

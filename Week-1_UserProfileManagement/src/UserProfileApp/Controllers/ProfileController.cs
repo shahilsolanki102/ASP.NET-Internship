@@ -16,11 +16,11 @@ namespace UserProfileApp.Controllers
         private readonly ILogger<ProfileController> _logger;
 
         public ProfileController(
-            IProfileService _profileService,
+            IProfileService profileService,
             IWebHostEnvironment webHostEnvironment,
             ILogger<ProfileController> logger)
         {
-            this._profileService = _profileService;
+            _profileService = profileService;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
         }
@@ -31,6 +31,11 @@ namespace UserProfileApp.Controllers
             return int.TryParse(userIdClaim, out int userId) ? userId : 0;
         }
 
+        private string GetClientIpAddress()
+        {
+            return HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -38,7 +43,7 @@ namespace UserProfileApp.Controllers
             var profile = await _profileService.GetProfileByUserIdAsync(userId);
             if (profile == null)
             {
-                TempData["ErrorMessage"] = "User profile could not be found.";
+                TempData["ErrorMessage"] = "User profile not found.";
                 return RedirectToAction("Login", "Account");
             }
 
@@ -64,21 +69,21 @@ namespace UserProfileApp.Controllers
         public async Task<IActionResult> Edit(EditProfileViewModel model)
         {
             int userId = GetCurrentUserId();
-            model.UserId = userId; // Ensure security by matching logged-in user
+            model.UserId = userId;
 
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var (success, message) = await _profileService.UpdateProfileAsync(model, _webHostEnvironment.WebRootPath);
+            var (success, message) = await _profileService.UpdateProfileAsync(model, _webHostEnvironment.WebRootPath, GetClientIpAddress());
             if (!success)
             {
                 TempData["ErrorMessage"] = message;
                 return View(model);
             }
 
-            // Refresh authentication cookie with new name & avatar if changed
+            // Refresh Authentication Cookie Claims
             var updatedProfile = await _profileService.GetProfileByUserIdAsync(userId);
             if (updatedProfile != null)
             {
@@ -95,7 +100,7 @@ namespace UserProfileApp.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             }
 
-            TempData["SuccessMessage"] = "Your profile has been successfully updated!";
+            TempData["SuccessMessage"] = "Profile updated successfully!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -120,14 +125,31 @@ namespace UserProfileApp.Controllers
                 return View(model);
             }
 
-            var (success, message) = await _profileService.ChangePasswordAsync(model);
+            var (success, message) = await _profileService.ChangePasswordAsync(model, GetClientIpAddress());
             if (!success)
             {
                 ModelState.AddModelError(string.Empty, message);
                 return View(model);
             }
 
-            TempData["SuccessMessage"] = "Password changed successfully!";
+            TempData["SuccessMessage"] = "Password updated successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Toggle2FA()
+        {
+            int userId = GetCurrentUserId();
+            var (success, isEnabled, message) = await _profileService.ToggleTwoFactorAsync(userId, GetClientIpAddress());
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

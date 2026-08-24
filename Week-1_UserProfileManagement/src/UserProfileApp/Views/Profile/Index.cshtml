@@ -1,135 +1,482 @@
 @model UserProfileApp.ViewModels.ProfileDetailsViewModel
 @{
-    ViewData["Title"] = "User Profile";
+    ViewData["Title"] = Model.FullName + " - Profile";
 }
 
+<style>
+    .profile-cover-banner {
+        height: 220px;
+        border-radius: 20px 20px 0 0;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    .profile-cover-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.75) 100%);
+        border-radius: 20px 20px 0 0;
+    }
+    .profile-avatar-large {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ffffff;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        background: #ffffff;
+    }
+    .skill-chip {
+        background: #f1f5f9;
+        color: #334155;
+        font-weight: 600;
+        font-size: 0.82rem;
+        padding: 6px 14px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.15s ease;
+    }
+    .skill-chip:hover {
+        background: #e0e7ff;
+        color: #4338ca;
+        border-color: #c7d2fe;
+    }
+    .nav-pills-modern .nav-link {
+        color: #64748b;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    .nav-pills-modern .nav-link.active {
+        background: var(--brand-gradient);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .timeline-item {
+        position: relative;
+        padding-left: 32px;
+        padding-bottom: 24px;
+        border-left: 2px solid #e2e8f0;
+    }
+    .timeline-item:last-child {
+        border-left: 2px solid transparent;
+        padding-bottom: 0;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -9px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #6366f1;
+        border: 3px solid #ffffff;
+        box-shadow: 0 0 0 2px #c7d2fe;
+    }
+</style>
+
 <div class="row justify-content-center">
-    <div class="col-lg-10">
-        <!-- Top Profile Banner & Card -->
-        <div class="custom-card mb-4 overflow-hidden position-relative">
-            <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); height: 140px;" class="w-100 position-relative">
-                <span class="badge bg-white text-primary position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow-sm fw-semibold">
-                    <i class="bi bi-patch-check-fill text-primary me-1"></i> Active Member
-                </span>
+    <div class="col-xl-11">
+        <!-- Main Profile Header Card -->
+        <div class="modern-card overflow-hidden mb-4 position-relative">
+            <!-- Cover Photo Banner -->
+            <div class="profile-cover-banner" style="background-image: url('@Model.CoverPhotoUrl');">
+                <div class="profile-cover-overlay"></div>
+                <div class="position-absolute top-0 end-0 m-3 d-flex gap-2">
+                    <span class="badge bg-dark bg-opacity-75 text-white px-3 py-2 rounded-pill backdrop-blur">
+                        <i class="bi bi-shield-check text-success me-1"></i> Identity Verified
+                    </span>
+                </div>
             </div>
-            
+
+            <!-- Profile Summary Bar -->
             <div class="p-4 pt-0">
-                <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between mt-n5 pb-3 border-bottom gap-3">
-                    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 text-center text-md-start" style="margin-top: -60px;">
-                        <img src="@Model.ProfilePictureUrl" alt="@Model.FullName" 
-                             class="rounded-circle shadow-lg border border-4 border-white bg-white" 
-                             style="width: 120px; height: 120px; object-fit: cover;"
-                             onerror="this.src='/images/default-avatar.png'" />
+                <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end justify-content-between gap-3" style="margin-top: -65px;">
+                    <div class="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-4 text-center text-md-start">
+                        <div class="position-relative">
+                            <img src="@Model.ProfilePictureUrl" alt="@Model.FullName" class="profile-avatar-large" onerror="this.src='/images/default-avatar.png'" />
+                            <span class="position-absolute bottom-0 end-0 bg-success border border-3 border-white rounded-circle p-2" title="Online Active"></span>
+                        </div>
                         <div>
-                            <h3 class="fw-bold mb-1">@Model.FullName</h3>
-                            <p class="text-muted mb-0 d-flex align-items-center justify-content-center justify-content-md-start gap-2 flex-wrap">
-                                <span><i class="bi bi-envelope me-1 text-primary"></i> @Model.Email</span>
-                                <span>&bull;</span>
-                                <span><i class="bi bi-person-badge me-1 text-secondary"></i> @@@Model.Username</span>
-                                <span>&bull;</span>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">@Model.Role</span>
-                            </p>
+                            <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 flex-wrap mb-1">
+                                <h2 class="fw-bolder mb-0 text-dark">@Model.FullName</h2>
+                                <i class="bi bi-patch-check-fill text-primary fs-5" title="Verified Account"></i>
+                            </div>
+                            <p class="text-secondary fw-semibold mb-2 fs-6">@Model.Headline</p>
+                            <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 flex-wrap text-muted small">
+                                <span><i class="bi bi-envelope-fill me-1 text-primary"></i> @Model.Email</span>
+                                <span><i class="bi bi-geo-alt-fill me-1 text-danger"></i> @(string.IsNullOrEmpty(Model.City) ? "Location Not Set" : $"{Model.City}, {Model.Country}")</span>
+                                <span><i class="bi bi-calendar3 me-1 text-secondary"></i> Member since @Model.AccountCreatedAt.ToString("MMM yyyy")</span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="d-flex gap-2">
-                        <a asp-action="Edit" class="btn btn-gradient px-3 py-2 rounded-pill shadow-sm d-flex align-items-center gap-1">
-                            <i class="bi bi-pencil-square"></i>
-                            <span>Edit Profile</span>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex align-items-center gap-2">
+                        <a asp-action="Edit" class="btn-modern-primary">
+                            <i class="bi bi-pencil-square"></i> Edit Profile
                         </a>
-                        <a asp-action="ChangePassword" class="btn btn-outline-secondary px-3 py-2 rounded-pill d-flex align-items-center gap-1">
-                            <i class="bi bi-shield-lock"></i>
-                            <span>Security</span>
+                        <a asp-action="ChangePassword" class="btn-modern-secondary">
+                            <i class="bi bi-shield-lock"></i> Security
                         </a>
                     </div>
                 </div>
 
-                <!-- Profile Information Grid -->
-                <div class="row g-4 mt-2">
-                    <!-- Left Column: Bio & Personal Details -->
-                    <div class="col-md-7">
-                        <div class="p-3 bg-light rounded-4 mb-4">
-                            <h6 class="fw-bold text-uppercase text-secondary small mb-3">
-                                <i class="bi bi-card-text me-1 text-primary"></i> About Me
-                            </h6>
-                            <p class="text-dark mb-0 lh-base">
-                                @(string.IsNullOrWhiteSpace(Model.Bio) ? "No bio provided yet. Click 'Edit Profile' to share a brief description about yourself." : Model.Bio)
+                <!-- Profile Completion Widget -->
+                <div class="mt-4 p-3 bg-light rounded-4 border border-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2 small">
+                        <span class="fw-bold text-dark"><i class="bi bi-speedometer2 text-primary me-1"></i> Profile Strength & Completion</span>
+                        <span class="fw-bold text-primary">@Model.ProfileCompletionPercentage%</span>
+                    </div>
+                    <div class="progress" style="height: 8px; border-radius: 10px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                             style="width: @Model.ProfileCompletionPercentage%; background: var(--brand-gradient);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabbed Navigation Menu -->
+        <ul class="nav nav-pills nav-pills-modern mb-4 gap-2 justify-content-center justify-content-md-start" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" data-bs-target="#overview" type="button" role="tab">
+                    <i class="bi bi-person-lines-fill me-1"></i> Overview & About
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="pill" data-bs-target="#security" type="button" role="tab">
+                    <i class="bi bi-shield-check me-1"></i> Security & Sessions
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="pill" data-bs-target="#activity" type="button" role="tab">
+                    <i class="bi bi-clock-history me-1"></i> Activity Audit Log
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab">
+                    <i class="bi bi-sliders me-1"></i> Preferences
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content Panes -->
+        <div class="tab-content" id="profileTabsContent">
+
+            <!-- TAB 1: OVERVIEW -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row g-4">
+                    <!-- Left: Bio, Skills & Socials -->
+                    <div class="col-lg-7">
+                        <!-- About Me -->
+                        <div class="modern-card p-4 mb-4">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-file-earmark-person text-primary"></i> Professional Biography
+                            </h5>
+                            <p class="text-secondary lh-base mb-0" style="font-size: 0.96rem;">
+                                @(string.IsNullOrWhiteSpace(Model.Bio) ? "No biography shared yet. Click 'Edit Profile' to introduce yourself." : Model.Bio)
                             </p>
                         </div>
 
-                        <div class="p-3 bg-light rounded-4">
-                            <h6 class="fw-bold text-uppercase text-secondary small mb-3">
-                                <i class="bi bi-geo-alt me-1 text-primary"></i> Address & Location
-                            </h6>
-                            <div class="row g-3 small">
-                                <div class="col-12">
-                                    <span class="text-muted d-block">Street Address:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Address) ? "Not specified" : Model.Address)</span>
+                        <!-- Technical Skills -->
+                        <div class="modern-card p-4 mb-4">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-code-slash text-primary"></i> Skills & Expertise
+                            </h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                @if (!string.IsNullOrWhiteSpace(Model.Skills))
+                                {
+                                    foreach (var skill in Model.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                                    {
+                                        <span class="skill-chip">
+                                            <i class="bi bi-check2 text-primary"></i> @skill
+                                        </span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No skills added yet.</span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Social Handles -->
+                        <div class="modern-card p-4">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-link-45deg text-primary"></i> Online Profiles & Social Links
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    @if (!string.IsNullOrEmpty(Model.GitHubUrl))
+                                    {
+                                        <a href="@Model.GitHubUrl" target="_blank" class="btn btn-light w-100 text-start d-flex align-items-center gap-2 p-2 rounded-3 border">
+                                            <i class="bi bi-github fs-5 text-dark"></i>
+                                            <div class="text-truncate">
+                                                <div class="fw-bold small text-dark">GitHub</div>
+                                                <div class="text-muted small text-truncate">@Model.GitHubUrl</div>
+                                            </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 rounded-3 bg-light border text-muted small"><i class="bi bi-github me-1"></i> GitHub: Not connected</div>
+                                    }
                                 </div>
                                 <div class="col-sm-6">
-                                    <span class="text-muted d-block">City:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.City) ? "Not specified" : Model.City)</span>
+                                    @if (!string.IsNullOrEmpty(Model.LinkedInUrl))
+                                    {
+                                        <a href="@Model.LinkedInUrl" target="_blank" class="btn btn-light w-100 text-start d-flex align-items-center gap-2 p-2 rounded-3 border">
+                                            <i class="bi bi-linkedin fs-5 text-primary"></i>
+                                            <div class="text-truncate">
+                                                <div class="fw-bold small text-dark">LinkedIn</div>
+                                                <div class="text-muted small text-truncate">@Model.LinkedInUrl</div>
+                                            </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 rounded-3 bg-light border text-muted small"><i class="bi bi-linkedin me-1"></i> LinkedIn: Not connected</div>
+                                    }
                                 </div>
                                 <div class="col-sm-6">
-                                    <span class="text-muted d-block">State / Province:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.State) ? "Not specified" : Model.State)</span>
+                                    @if (!string.IsNullOrEmpty(Model.TwitterUrl))
+                                    {
+                                        <a href="@Model.TwitterUrl" target="_blank" class="btn btn-light w-100 text-start d-flex align-items-center gap-2 p-2 rounded-3 border">
+                                            <i class="bi bi-twitter-x fs-5 text-dark"></i>
+                                            <div class="text-truncate">
+                                                <div class="fw-bold small text-dark">Twitter / X</div>
+                                                <div class="text-muted small text-truncate">@Model.TwitterUrl</div>
+                                            </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 rounded-3 bg-light border text-muted small"><i class="bi bi-twitter-x me-1"></i> Twitter / X: Not connected</div>
+                                    }
                                 </div>
                                 <div class="col-sm-6">
-                                    <span class="text-muted d-block">Country:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Country) ? "Not specified" : Model.Country)</span>
-                                </div>
-                                <div class="col-sm-6">
-                                    <span class="text-muted d-block">Postal Code:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.PostalCode) ? "Not specified" : Model.PostalCode)</span>
+                                    @if (!string.IsNullOrEmpty(Model.WebsiteUrl))
+                                    {
+                                        <a href="@Model.WebsiteUrl" target="_blank" class="btn btn-light w-100 text-start d-flex align-items-center gap-2 p-2 rounded-3 border">
+                                            <i class="bi bi-globe fs-5 text-success"></i>
+                                            <div class="text-truncate">
+                                                <div class="fw-bold small text-dark">Portfolio</div>
+                                                <div class="text-muted small text-truncate">@Model.WebsiteUrl</div>
+                                            </div>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <div class="p-2 rounded-3 bg-light border text-muted small"><i class="bi bi-globe me-1"></i> Portfolio: Not connected</div>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column: Personal & Account Summary -->
-                    <div class="col-md-5">
-                        <div class="p-3 bg-light rounded-4 mb-4">
-                            <h6 class="fw-bold text-uppercase text-secondary small mb-3">
-                                <i class="bi bi-person-lines-fill me-1 text-primary"></i> Personal Details
-                            </h6>
-                            <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                    <span class="text-muted">Phone Number:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not set" : Model.PhoneNumber)</span>
+                    <!-- Right: Personal Information & Contact -->
+                    <div class="col-lg-5">
+                        <div class="modern-card p-4 mb-4">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-person-badge text-primary"></i> Personal Details
+                            </h5>
+                            <ul class="list-unstyled small mb-0 d-flex flex-column gap-3">
+                                <li class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                                    <span class="text-muted"><i class="bi bi-telephone me-1 text-primary"></i> Phone:</span>
+                                    <span class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not Provided" : Model.PhoneNumber)</span>
                                 </li>
-                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                    <span class="text-muted">Date of Birth:</span>
-                                    <span class="fw-semibold">@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("dd MMM yyyy") : "Not set")</span>
+                                <li class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                                    <span class="text-muted"><i class="bi bi-calendar-event me-1 text-primary"></i> Birthday:</span>
+                                    <span class="fw-bold text-dark">@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("dd MMMM yyyy") : "Not Set")</span>
                                 </li>
-                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                    <span class="text-muted">Gender:</span>
-                                    <span class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Gender) ? "Not set" : Model.Gender)</span>
+                                <li class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                                    <span class="text-muted"><i class="bi bi-gender-ambiguous me-1 text-primary"></i> Gender:</span>
+                                    <span class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.Gender) ? "Not Specified" : Model.Gender)</span>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                                    <span class="text-muted"><i class="bi bi-translate me-1 text-primary"></i> Language:</span>
+                                    <span class="fw-bold text-dark">@Model.Language</span>
+                                </li>
+                                <li class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted"><i class="bi bi-clock me-1 text-primary"></i> Time Zone:</span>
+                                    <span class="fw-bold text-dark text-truncate" style="max-width: 180px;">@Model.TimeZone</span>
                                 </li>
                             </ul>
                         </div>
 
-                        <div class="p-3 bg-light rounded-4">
-                            <h6 class="fw-bold text-uppercase text-secondary small mb-3">
-                                <i class="bi bi-clock-history me-1 text-primary"></i> Account Timestamps
-                            </h6>
-                            <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                    <span class="text-muted">Member Since:</span>
-                                    <span class="fw-semibold">@Model.AccountCreatedAt.ToString("MMM dd, yyyy")</span>
-                                </li>
-                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                    <span class="text-muted">Last Profile Update:</span>
-                                    <span class="fw-semibold">@Model.ProfileUpdatedAt.ToString("MMM dd, yyyy HH:mm")</span>
-                                </li>
-                                <li class="d-flex justify-content-between py-1">
-                                    <span class="text-muted">Last Login:</span>
-                                    <span class="fw-semibold">@(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("MMM dd, yyyy HH:mm") : "Recently")</span>
-                                </li>
-                            </ul>
+                        <div class="modern-card p-4">
+                            <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-pin-map text-primary"></i> Residential Address
+                            </h5>
+                            <div class="p-3 bg-light rounded-3 small">
+                                <div class="mb-2">
+                                    <span class="text-muted d-block">Street:</span>
+                                    <span class="fw-bold text-dark">@(string.IsNullOrEmpty(Model.Address) ? "No street address" : Model.Address)</span>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">City / State:</span>
+                                        <span class="fw-bold text-dark">@Model.City, @Model.State</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">Country (Zip):</span>
+                                        <span class="fw-bold text-dark">@Model.Country (@Model.PostalCode)</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- TAB 2: SECURITY & SESSIONS -->
+            <div class="tab-pane fade" id="security" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <!-- Two-Factor Authentication Box -->
+                        <div class="modern-card p-4 mb-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold text-dark mb-1">Two-Factor Authentication (2FA)</h5>
+                                    <p class="text-muted small mb-0">Protect your account with an additional verification layer.</p>
+                                </div>
+                                @if (Model.TwoFactorEnabled)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill">
+                                        <i class="bi bi-shield-lock-fill me-1"></i> Enabled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning-subtle text-warning border border-warning px-3 py-2 rounded-pill">
+                                        <i class="bi bi-shield-x me-1"></i> Disabled
+                                    </span>
+                                }
+                            </div>
+                            <form asp-action="Toggle2FA" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn @(Model.TwoFactorEnabled ? "btn-outline-danger" : "btn-outline-primary") rounded-pill px-4 btn-sm fw-bold">
+                                    @(Model.TwoFactorEnabled ? "Disable 2FA" : "Enable 2FA Now")
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Change Password Card -->
+                        <div class="modern-card p-4">
+                            <h5 class="fw-bold text-dark mb-1">Account Password</h5>
+                            <p class="text-muted small mb-3">Last modified on @Model.ProfileUpdatedAt.ToString("MMM dd, yyyy").</p>
+                            <a asp-action="ChangePassword" class="btn-modern-primary btn-sm">
+                                <i class="bi bi-key-fill"></i> Update Account Password
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Active Sessions List -->
+                    <div class="col-lg-6">
+                        <div class="modern-card p-4">
+                            <h5 class="fw-bold text-dark mb-1">Active Login Sessions</h5>
+                            <p class="text-muted small mb-3">Devices currently authenticated to your account.</p>
+
+                            <div class="d-flex flex-column gap-3">
+                                @foreach (var session in Model.Sessions)
+                                {
+                                    <div class="p-3 bg-light rounded-3 border d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="p-2 rounded-circle bg-white shadow-sm text-primary">
+                                                <i class="bi @(session.Device.Contains("iPhone") || session.Device.Contains("Mobile") ? "bi-phone" : "bi-laptop") fs-4"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark small">@session.Device</div>
+                                                <div class="text-muted small">@session.Browser &bull; IP: @session.IpAddress</div>
+                                                <div class="text-muted small"><i class="bi bi-geo-alt"></i> @session.Location</div>
+                                            </div>
+                                        </div>
+                                        @if (session.IsCurrent)
+                                        {
+                                            <span class="badge bg-primary text-white rounded-pill px-2 py-1 small">Current</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">@session.LastActive.ToString("dd MMM")</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ACTIVITY TIMELINE -->
+            <div class="tab-pane fade" id="activity" role="tabpanel">
+                <div class="modern-card p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                        <i class="bi bi-clock-history text-primary"></i> Real-time Activity Timeline
+                    </h5>
+
+                    <div class="timeline-wrapper">
+                        @if (Model.ActivityLogs.Any())
+                        {
+                            foreach (var log in Model.ActivityLogs)
+                            {
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <span class="badge bg-primary-subtle text-primary border rounded-pill px-2 py-1 small mb-1">@log.ActivityType</span>
+                                            <h6 class="fw-bold text-dark mb-1">@log.Description</h6>
+                                            <div class="text-muted small">IP Address: @(log.IpAddress ?? "127.0.0.1")</div>
+                                        </div>
+                                        <span class="text-muted small">@log.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted">No recent activity found.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: PREFERENCES -->
+            <div class="tab-pane fade" id="settings" role="tabpanel">
+                <div class="modern-card p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-4">Account Preferences & Privacy</h5>
+
+                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <div>
+                            <div class="fw-bold text-dark">Public Profile Visibility</div>
+                            <div class="text-muted small">Allow other authenticated team members to view your bio and portfolio.</div>
+                        </div>
+                        <span class="badge @(Model.IsProfilePublic ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary") px-3 py-2 rounded-pill">
+                            @(Model.IsProfilePublic ? "Public" : "Private")
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                        <div>
+                            <div class="fw-bold text-dark">Email Activity Notifications</div>
+                            <div class="text-muted small">Receive security alerts and system updates on your email.</div>
+                        </div>
+                        <span class="badge @(Model.EmailNotifications ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary") px-3 py-2 rounded-pill">
+                            @(Model.EmailNotifications ? "Subscribed" : "Muted")
+                        </span>
+                    </div>
+
+                    <div class="mt-4 pt-2">
+                        <a asp-action="Edit" class="btn-modern-primary">
+                            <i class="bi bi-gear-fill"></i> Modify Preferences in Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

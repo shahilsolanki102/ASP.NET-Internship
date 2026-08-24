@@ -1,79 +1,92 @@
 @model UserProfileApp.ViewModels.EditProfileViewModel
 @{
-    ViewData["Title"] = "Edit Profile";
+    ViewData["Title"] = "Account Settings & Profile Edit";
 }
 
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+    <div class="col-xl-10">
+        <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bold mb-1">Edit Your Profile</h3>
-                <p class="text-muted mb-0">Update your public information, avatar, and contact details.</p>
+                <h3 class="fw-bolder mb-1 text-dark">Profile Settings</h3>
+                <p class="text-secondary mb-0">Update your public identity, bio, social presence, and application preferences.</p>
             </div>
-            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">
+            <a asp-action="Index" class="btn-modern-secondary">
                 <i class="bi bi-arrow-left me-1"></i> Back to Profile
             </a>
         </div>
 
-        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="custom-card p-4 p-md-5">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="modern-card p-4 p-md-5">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="UserId" />
             <input type="hidden" asp-for="Username" />
             <input type="hidden" asp-for="CurrentProfilePictureUrl" />
+            <input type="hidden" asp-for="CurrentCoverPhotoUrl" />
 
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4"></div>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-4 mb-4 small"></div>
 
-            <!-- 1. Profile Picture Upload Section -->
-            <div class="p-4 bg-light rounded-4 mb-4">
-                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-image text-primary"></i> Profile Photo
+            <!-- 1. Visual Branding (Avatar + Cover) -->
+            <div class="p-4 bg-light rounded-4 mb-4 border">
+                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-camera-fill text-primary"></i> Visual Identity & Media
                 </h5>
-                <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
-                    <div class="position-relative">
-                        <img id="avatarPreview" src="@Model.CurrentProfilePictureUrl" alt="Avatar Preview" 
-                             class="rounded-circle shadow border border-3 border-white bg-white" 
-                             style="width: 110px; height: 110px; object-fit: cover;"
+
+                <div class="row g-4 align-items-center">
+                    <!-- Avatar Preview -->
+                    <div class="col-md-6 d-flex align-items-center gap-3">
+                        <img id="avatarPreview" src="@Model.CurrentProfilePictureUrl" alt="Avatar" 
+                             class="rounded-circle shadow border border-3 border-white" 
+                             style="width: 84px; height: 84px; object-fit: cover;"
                              onerror="this.src='/images/default-avatar.png'" />
-                    </div>
-                    <div class="flex-grow-1">
-                        <label asp-for="ProfilePictureFile" class="form-label fw-semibold">Choose New Photo</label>
-                        <input asp-for="ProfilePictureFile" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this);" />
-                        <div class="form-text text-muted small mt-1">
-                            Supported formats: JPG, PNG, WebP &bull; Max file size: 2MB.
+                        <div class="flex-grow-1">
+                            <label asp-for="ProfilePictureFile" class="form-label fw-bold text-dark small mb-1">Change Avatar</label>
+                            <input asp-for="ProfilePictureFile" type="file" class="form-control form-control-modern form-control-sm" accept=".jpg,.jpeg,.png,.webp" onchange="previewAvatar(this);" />
+                            <span class="text-muted" style="font-size: 0.75rem;">JPG, PNG, WebP (Max 3MB)</span>
                         </div>
-                        <span asp-validation-for="ProfilePictureFile" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Cover Preview -->
+                    <div class="col-md-6">
+                        <label asp-for="CoverPhotoFile" class="form-label fw-bold text-dark small mb-1">Change Cover Banner</label>
+                        <input asp-for="CoverPhotoFile" type="file" class="form-control form-control-modern form-control-sm" accept=".jpg,.jpeg,.png,.webp" />
+                        <span class="text-muted" style="font-size: 0.75rem;">Recommended size: 1200x300 px</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. Basic Information Section -->
-            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                <i class="bi bi-person text-primary"></i> Basic Information
+            <!-- 2. Primary Details -->
+            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+                <i class="bi bi-person-bounding-box text-primary"></i> Personal & Professional Info
             </h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label asp-for="FullName" class="form-label fw-semibold"></label>
-                    <input asp-for="FullName" class="form-control rounded-3" placeholder="Enter your full name" />
+                    <label asp-for="FullName" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="FullName" class="form-control form-control-modern" placeholder="e.g. Shahil Patel" />
                     <span asp-validation-for="FullName" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Email" class="form-label fw-semibold"></label>
-                    <input asp-for="Email" type="email" class="form-control rounded-3" placeholder="name@example.com" />
+                    <label asp-for="Headline" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="Headline" class="form-control form-control-modern" placeholder="e.g. Full-Stack ASP.NET Core Engineer" />
+                    <span asp-validation-for="Headline" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="Email" type="email" class="form-control form-control-modern" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
-                    <input asp-for="PhoneNumber" class="form-control rounded-3" placeholder="+91 98765 43210" />
+                    <label asp-for="PhoneNumber" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="PhoneNumber" class="form-control form-control-modern" placeholder="+91 98765 43210" />
                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="DateOfBirth" class="form-label fw-semibold"></label>
-                    <input asp-for="DateOfBirth" type="date" class="form-control rounded-3" />
+                    <label asp-for="DateOfBirth" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control form-control-modern" />
                     <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Gender" class="form-label fw-semibold"></label>
-                    <select asp-for="Gender" class="form-select rounded-3">
+                    <label asp-for="Gender" class="form-label fw-bold text-dark small"></label>
+                    <select asp-for="Gender" class="form-select form-select-modern">
                         <option value="">-- Select Gender --</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -83,49 +96,104 @@
                     <span asp-validation-for="Gender" class="text-danger small"></span>
                 </div>
                 <div class="col-12">
-                    <label asp-for="Bio" class="form-label fw-semibold"></label>
-                    <textarea asp-for="Bio" rows="3" class="form-control rounded-3" placeholder="Tell us a little bit about yourself, skills, or role..."></textarea>
+                    <label asp-for="Bio" class="form-label fw-bold text-dark small"></label>
+                    <textarea asp-for="Bio" rows="4" class="form-control form-control-modern" placeholder="Write a short summary about your technical background, projects, or goals..."></textarea>
                     <span asp-validation-for="Bio" class="text-danger small"></span>
                 </div>
+                <div class="col-12">
+                    <label asp-for="Skills" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="Skills" class="form-control form-control-modern" placeholder="C#, ASP.NET Core, SQL Server, Entity Framework, Bootstrap 5, Git" />
+                    <span class="text-muted" style="font-size: 0.75rem;">Separate skills with commas (e.g. C#, SQL Server, Docker)</span>
+                    <span asp-validation-for="Skills" class="text-danger small"></span>
+                </div>
             </div>
 
-            <!-- 3. Address & Location Section -->
-            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
-                <i class="bi bi-geo-alt text-primary"></i> Address & Location
+            <!-- 3. Social Presence & Web Links -->
+            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+                <i class="bi bi-globe2 text-primary"></i> Social Profiles & Portfolio
             </h5>
             <div class="row g-3 mb-4">
-                <div class="col-12">
-                    <label asp-for="Address" class="form-label fw-semibold"></label>
-                    <input asp-for="Address" class="form-control rounded-3" placeholder="Apartment, suite, street address" />
-                    <span asp-validation-for="Address" class="text-danger small"></span>
+                <div class="col-md-6">
+                    <label asp-for="GitHubUrl" class="form-label fw-bold text-dark small"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-github"></i></span>
+                        <input asp-for="GitHubUrl" class="form-control form-control-modern border-start-0" placeholder="https://github.com/username" />
+                    </div>
+                    <span asp-validation-for="GitHubUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="City" class="form-label fw-semibold"></label>
-                    <input asp-for="City" class="form-control rounded-3" placeholder="City" />
-                    <span asp-validation-for="City" class="text-danger small"></span>
+                    <label asp-for="LinkedInUrl" class="form-label fw-bold text-dark small"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-linkedin text-primary"></i></span>
+                        <input asp-for="LinkedInUrl" class="form-control form-control-modern border-start-0" placeholder="https://linkedin.com/in/username" />
+                    </div>
+                    <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="State" class="form-label fw-semibold"></label>
-                    <input asp-for="State" class="form-control rounded-3" placeholder="State / Province" />
-                    <span asp-validation-for="State" class="text-danger small"></span>
+                    <label asp-for="TwitterUrl" class="form-label fw-bold text-dark small"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-twitter-x"></i></span>
+                        <input asp-for="TwitterUrl" class="form-control form-control-modern border-start-0" placeholder="https://twitter.com/username" />
+                    </div>
+                    <span asp-validation-for="TwitterUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Country" class="form-label fw-semibold"></label>
-                    <input asp-for="Country" class="form-control rounded-3" placeholder="Country" />
-                    <span asp-validation-for="Country" class="text-danger small"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="PostalCode" class="form-label fw-semibold"></label>
-                    <input asp-for="PostalCode" class="form-control rounded-3" placeholder="ZIP / Postal Code" />
-                    <span asp-validation-for="PostalCode" class="text-danger small"></span>
+                    <label asp-for="WebsiteUrl" class="form-label fw-bold text-dark small"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-link-45deg text-success"></i></span>
+                        <input asp-for="WebsiteUrl" class="form-control form-control-modern border-start-0" placeholder="https://yourportfolio.dev" />
+                    </div>
+                    <span asp-validation-for="WebsiteUrl" class="text-danger small"></span>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                <a asp-action="Index" class="btn btn-light rounded-pill px-4">Cancel</a>
-                <button type="submit" class="btn btn-gradient rounded-pill px-5">
-                    <i class="bi bi-check2-circle me-1"></i> Save Changes
+            <!-- 4. Address & Preferences -->
+            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+                <i class="bi bi-geo-alt-fill text-primary"></i> Location & Preferences
+            </h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label asp-for="Address" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="Address" class="form-control form-control-modern" placeholder="Street Address" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="City" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="City" class="form-control form-control-modern" placeholder="City" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="State" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="State" class="form-control form-control-modern" placeholder="State" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Country" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="Country" class="form-control form-control-modern" placeholder="Country" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="PostalCode" class="form-label fw-bold text-dark small"></label>
+                    <input asp-for="PostalCode" class="form-control form-control-modern" placeholder="Postal / Zip Code" />
+                </div>
+
+                <div class="col-md-6 mt-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="IsProfilePublic" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="IsProfilePublic" class="form-check-label fw-bold text-dark small">Public Profile Visibility</label>
+                        <div class="text-muted" style="font-size: 0.78rem;">Allow team members to discover your profile and skills.</div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="EmailNotifications" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="EmailNotifications" class="form-check-label fw-bold text-dark small">Security & Update Emails</label>
+                        <div class="text-muted" style="font-size: 0.78rem;">Receive critical login alerts and updates.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Action -->
+            <div class="d-flex justify-content-end gap-3 pt-4 border-top mt-4">
+                <a asp-action="Index" class="btn-modern-secondary">Cancel</a>
+                <button type="submit" class="btn-modern-primary px-5">
+                    <i class="bi bi-check2-circle"></i> Save Changes
                 </button>
             </div>
         </form>
@@ -135,7 +203,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        function previewImage(input) {
+        function previewAvatar(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
