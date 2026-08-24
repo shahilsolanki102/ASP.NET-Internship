@@ -9,8 +9,8 @@ namespace PerformanceOptimizationApp.Services
     /// 1. N+1 Queries: Performs a separate SQL query for each Category and Supplier inside a loop.
     /// 2. Synchronous Blocking: Uses synchronous methods causing thread starvation under load.
     /// 3. Memory Bloat: No AsNoTracking() - EF Core change tracker tracks every entity in RAM.
-    /// 4. Client-side Filtering: Pulls entire datasets into application memory.
-    /// 5. Missing Caching: Repeatedly queries the database for identical data.
+    /// 4. Client-side Filtering: Pulls datasets into application memory for client evaluation.
+    /// 5. Missing Caching: Repeatedly queries the database for static lookup data.
     /// </summary>
     public class LegacyProductService : ILegacyProductService
     {
@@ -21,14 +21,14 @@ namespace PerformanceOptimizationApp.Services
             _context = context;
         }
 
-        public List<ProductDto> GetProductsLegacy(int topCount = 100)
+        public List<ProductDto> GetProductsLegacy(int topCount = 30)
         {
-            // Inefficiency 1: Fetching without projection or eager loading
+            // Inefficiency 1: Fetching entities into Change Tracker without projection
             var products = _context.Products.Take(topCount).ToList();
 
             var result = new List<ProductDto>();
 
-            // Inefficiency 2: N+1 Queries Problem! (Generates 200+ extra database round-trips)
+            // Inefficiency 2: N+1 Queries Problem! (Generates separate round-trips for each item)
             foreach (var prod in products)
             {
                 var category = _context.Categories.FirstOrDefault(c => c.Id == prod.CategoryId);
@@ -52,19 +52,20 @@ namespace PerformanceOptimizationApp.Services
 
         public List<TopSellingReportDto> GetTopSellingReportLegacy()
         {
-            // Inefficiency 3: Pulling thousands of OrderDetails into memory to aggregate in C# LINQ
-            var allDetails = _context.OrderDetails.ToList();
-            var allProducts = _context.Products.ToList();
-            var allCategories = _context.Categories.ToList();
-            var allSuppliers = _context.Suppliers.ToList();
+            // Inefficiency 3: Fetching unaggregated order details into client memory
+            var orderDetailsSubset = _context.OrderDetails.Take(500).ToList();
+            var productIds = orderDetailsSubset.Select(od => od.ProductId).Distinct().ToList();
+            var products = _context.Products.Where(p => productIds.Contains(p.Id)).ToList();
+            var categories = _context.Categories.ToList();
+            var suppliers = _context.Suppliers.ToList();
 
-            var report = allDetails
+            var report = orderDetailsSubset
                 .GroupBy(od => od.ProductId)
                 .Select(g =>
                 {
-                    var prod = allProducts.FirstOrDefault(p => p.Id == g.Key);
-                    var cat = allCategories.FirstOrDefault(c => c.Id == prod?.CategoryId);
-                    var sup = allSuppliers.FirstOrDefault(s => s.Id == prod?.SupplierId);
+                    var prod = products.FirstOrDefault(p => p.Id == g.Key);
+                    var cat = categories.FirstOrDefault(c => c.Id == prod?.CategoryId);
+                    var sup = suppliers.FirstOrDefault(s => s.Id == prod?.SupplierId);
 
                     return new TopSellingReportDto
                     {
