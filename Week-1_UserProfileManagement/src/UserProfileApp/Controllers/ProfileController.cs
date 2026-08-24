@@ -152,5 +152,32 @@ namespace UserProfileApp.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TerminateOtherSessions()
+        {
+            int userId = GetCurrentUserId();
+            var (success, message) = await _profileService.TerminateOtherSessionsAsync(userId, GetClientIpAddress());
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportSummary()
+        {
+            int userId = GetCurrentUserId();
+            var profile = await _profileService.GetProfileByUserIdAsync(userId);
+            if (profile == null) return RedirectToAction(nameof(Index));
+
+            return View(profile);
+        }
     }
 }

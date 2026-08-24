@@ -128,7 +128,6 @@ namespace UserProfileApp.Services
                     return (false, "User not found.");
                 }
 
-                // Check email uniqueness if modified
                 if (!string.Equals(user.Email, model.Email, StringComparison.OrdinalIgnoreCase))
                 {
                     bool emailExists = await _context.Users.AnyAsync(u => u.Email == model.Email && u.Id != model.UserId);
@@ -262,6 +261,39 @@ namespace UserProfileApp.Services
             return (true, user.TwoFactorEnabled, user.TwoFactorEnabled ? "Two-Factor Authentication is now ENABLED." : "Two-Factor Authentication is now DISABLED.");
         }
 
+        public async Task<(bool Success, string Message)> TerminateOtherSessionsAsync(int userId, string? ipAddress = null)
+        {
+            try
+            {
+                var otherSessions = await _context.UserSessions
+                    .Where(s => s.UserId == userId && !s.IsCurrent)
+                    .ToListAsync();
+
+                if (otherSessions.Any())
+                {
+                    _context.UserSessions.RemoveRange(otherSessions);
+                    
+                    _context.UserActivityLogs.Add(new UserActivityLog
+                    {
+                        UserId = userId,
+                        ActivityType = "Security",
+                        Description = $"Terminated {otherSessions.Count} active sessions across other devices",
+                        IpAddress = ipAddress,
+                        CreatedAt = DateTime.UtcNow
+                    });
+
+                    await _context.SaveChangesAsync();
+                }
+
+                return (true, "All other sessions have been successfully logged out.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error terminating sessions for user {UserId}", userId);
+                return (false, "An error occurred while terminating sessions.");
+            }
+        }
+
         public async Task<(bool Success, string Message)> LogActivityAsync(int userId, string activityType, string description, string? ipAddress = null)
         {
             try
@@ -286,7 +318,7 @@ namespace UserProfileApp.Services
 
         private static int CalculateProfileCompletion(UserProfile p)
         {
-            int score = 20; // Base score for account
+            int score = 20;
             if (!string.IsNullOrWhiteSpace(p.FullName)) score += 10;
             if (!string.IsNullOrWhiteSpace(p.Headline)) score += 10;
             if (!string.IsNullOrWhiteSpace(p.PhoneNumber)) score += 10;

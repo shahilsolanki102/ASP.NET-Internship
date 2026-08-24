@@ -3,31 +3,79 @@
     ViewData["Title"] = "Account Settings & Profile Edit";
 }
 
+<style>
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px;
+        border: 1.5px solid var(--card-border);
+        border-radius: 12px;
+        background: var(--bs-body-bg);
+        min-height: 48px;
+    }
+    .skill-tag-editable {
+        background: #e0e7ff;
+        color: #4338ca;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    [data-bs-theme="dark"] .skill-tag-editable {
+        background: #312e81;
+        color: #e0e7ff;
+    }
+    .skill-tag-editable .btn-close-tag {
+        cursor: pointer;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        transition: opacity 0.15s;
+    }
+    .skill-tag-editable .btn-close-tag:hover {
+        opacity: 1;
+        color: #ef4444;
+    }
+    .skill-input-inline {
+        border: none;
+        outline: none;
+        background: transparent;
+        flex-grow: 1;
+        min-width: 140px;
+        font-size: 0.92rem;
+        color: var(--bs-body-color);
+    }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-xl-10">
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
-                <h3 class="fw-bolder mb-1 text-dark">Profile Settings</h3>
-                <p class="text-secondary mb-0">Update your public identity, bio, social presence, and application preferences.</p>
+                <h3 class="fw-bolder mb-1 text-body">Profile Settings</h3>
+                <p class="text-body-secondary mb-0">Update your public identity, bio, skills, social presence, and preferences.</p>
             </div>
             <a asp-action="Index" class="btn-modern-secondary">
                 <i class="bi bi-arrow-left me-1"></i> Back to Profile
             </a>
         </div>
 
-        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="modern-card p-4 p-md-5">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data" class="modern-card p-4 p-md-5 bg-body">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="UserId" />
             <input type="hidden" asp-for="Username" />
             <input type="hidden" asp-for="CurrentProfilePictureUrl" />
             <input type="hidden" asp-for="CurrentCoverPhotoUrl" />
+            <input type="hidden" asp-for="Skills" id="hiddenSkillsInput" />
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-4 mb-4 small"></div>
 
             <!-- 1. Visual Branding (Avatar + Cover) -->
-            <div class="p-4 bg-light rounded-4 mb-4 border">
-                <h5 class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+            <div class="p-4 bg-body-tertiary rounded-4 mb-4 border">
+                <h5 class="fw-bold text-body mb-3 d-flex align-items-center gap-2">
                     <i class="bi bi-camera-fill text-primary"></i> Visual Identity & Media
                 </h5>
 
@@ -39,7 +87,7 @@
                              style="width: 84px; height: 84px; object-fit: cover;"
                              onerror="this.src='/images/default-avatar.png'" />
                         <div class="flex-grow-1">
-                            <label asp-for="ProfilePictureFile" class="form-label fw-bold text-dark small mb-1">Change Avatar</label>
+                            <label asp-for="ProfilePictureFile" class="form-label fw-bold text-body small mb-1">Change Avatar</label>
                             <input asp-for="ProfilePictureFile" type="file" class="form-control form-control-modern form-control-sm" accept=".jpg,.jpeg,.png,.webp" onchange="previewAvatar(this);" />
                             <span class="text-muted" style="font-size: 0.75rem;">JPG, PNG, WebP (Max 3MB)</span>
                         </div>
@@ -47,7 +95,7 @@
 
                     <!-- Cover Preview -->
                     <div class="col-md-6">
-                        <label asp-for="CoverPhotoFile" class="form-label fw-bold text-dark small mb-1">Change Cover Banner</label>
+                        <label asp-for="CoverPhotoFile" class="form-label fw-bold text-body small mb-1">Change Cover Banner</label>
                         <input asp-for="CoverPhotoFile" type="file" class="form-control form-control-modern form-control-sm" accept=".jpg,.jpeg,.png,.webp" />
                         <span class="text-muted" style="font-size: 0.75rem;">Recommended size: 1200x300 px</span>
                     </div>
@@ -55,37 +103,37 @@
             </div>
 
             <!-- 2. Primary Details -->
-            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-body mb-3 mt-4 d-flex align-items-center gap-2">
                 <i class="bi bi-person-bounding-box text-primary"></i> Personal & Professional Info
             </h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label asp-for="FullName" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="FullName" class="form-label fw-bold text-body small"></label>
                     <input asp-for="FullName" class="form-control form-control-modern" placeholder="e.g. Shahil Patel" />
                     <span asp-validation-for="FullName" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Headline" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Headline" class="form-label fw-bold text-body small"></label>
                     <input asp-for="Headline" class="form-control form-control-modern" placeholder="e.g. Full-Stack ASP.NET Core Engineer" />
                     <span asp-validation-for="Headline" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Email" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Email" class="form-label fw-bold text-body small"></label>
                     <input asp-for="Email" type="email" class="form-control form-control-modern" />
                     <span asp-validation-for="Email" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="PhoneNumber" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="PhoneNumber" class="form-label fw-bold text-body small"></label>
                     <input asp-for="PhoneNumber" class="form-control form-control-modern" placeholder="+91 98765 43210" />
                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="DateOfBirth" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="DateOfBirth" class="form-label fw-bold text-body small"></label>
                     <input asp-for="DateOfBirth" type="date" class="form-control form-control-modern" />
                     <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Gender" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Gender" class="form-label fw-bold text-body small"></label>
                     <select asp-for="Gender" class="form-select form-select-modern">
                         <option value="">-- Select Gender --</option>
                         <option value="Male">Male</option>
@@ -96,51 +144,55 @@
                     <span asp-validation-for="Gender" class="text-danger small"></span>
                 </div>
                 <div class="col-12">
-                    <label asp-for="Bio" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Bio" class="form-label fw-bold text-body small"></label>
                     <textarea asp-for="Bio" rows="4" class="form-control form-control-modern" placeholder="Write a short summary about your technical background, projects, or goals..."></textarea>
                     <span asp-validation-for="Bio" class="text-danger small"></span>
                 </div>
+
+                <!-- Interactive Skills Tag Input -->
                 <div class="col-12">
-                    <label asp-for="Skills" class="form-label fw-bold text-dark small"></label>
-                    <input asp-for="Skills" class="form-control form-control-modern" placeholder="C#, ASP.NET Core, SQL Server, Entity Framework, Bootstrap 5, Git" />
-                    <span class="text-muted" style="font-size: 0.75rem;">Separate skills with commas (e.g. C#, SQL Server, Docker)</span>
-                    <span asp-validation-for="Skills" class="text-danger small"></span>
+                    <label class="form-label fw-bold text-body small">Technical Skills (Type and press Enter or Comma)</label>
+                    <div class="skills-container" id="skillsTagContainer" onclick="document.getElementById('skillInputField').focus();">
+                        <!-- Dynamic Tags inserted by JS -->
+                        <input type="text" id="skillInputField" class="skill-input-inline" placeholder="Add a skill (e.g. Docker, Microservices)..." />
+                    </div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Skills will be automatically saved and displayed as badge chips on your profile.</span>
                 </div>
             </div>
 
             <!-- 3. Social Presence & Web Links -->
-            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-body mb-3 mt-4 d-flex align-items-center gap-2">
                 <i class="bi bi-globe2 text-primary"></i> Social Profiles & Portfolio
             </h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label asp-for="GitHubUrl" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="GitHubUrl" class="form-label fw-bold text-body small"></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-github"></i></span>
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-github"></i></span>
                         <input asp-for="GitHubUrl" class="form-control form-control-modern border-start-0" placeholder="https://github.com/username" />
                     </div>
                     <span asp-validation-for="GitHubUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="LinkedInUrl" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="LinkedInUrl" class="form-label fw-bold text-body small"></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-linkedin text-primary"></i></span>
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-linkedin text-primary"></i></span>
                         <input asp-for="LinkedInUrl" class="form-control form-control-modern border-start-0" placeholder="https://linkedin.com/in/username" />
                     </div>
                     <span asp-validation-for="LinkedInUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="TwitterUrl" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="TwitterUrl" class="form-label fw-bold text-body small"></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-twitter-x"></i></span>
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-twitter-x"></i></span>
                         <input asp-for="TwitterUrl" class="form-control form-control-modern border-start-0" placeholder="https://twitter.com/username" />
                     </div>
                     <span asp-validation-for="TwitterUrl" class="text-danger small"></span>
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="WebsiteUrl" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="WebsiteUrl" class="form-label fw-bold text-body small"></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-link-45deg text-success"></i></span>
+                        <span class="input-group-text bg-body-tertiary border-end-0"><i class="bi bi-globe text-success"></i></span>
                         <input asp-for="WebsiteUrl" class="form-control form-control-modern border-start-0" placeholder="https://yourportfolio.dev" />
                     </div>
                     <span asp-validation-for="WebsiteUrl" class="text-danger small"></span>
@@ -148,42 +200,42 @@
             </div>
 
             <!-- 4. Address & Preferences -->
-            <h5 class="fw-bold text-dark mb-3 mt-4 d-flex align-items-center gap-2">
+            <h5 class="fw-bold text-body mb-3 mt-4 d-flex align-items-center gap-2">
                 <i class="bi bi-geo-alt-fill text-primary"></i> Location & Preferences
             </h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label asp-for="Address" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Address" class="form-label fw-bold text-body small"></label>
                     <input asp-for="Address" class="form-control form-control-modern" placeholder="Street Address" />
                 </div>
                 <div class="col-md-3">
-                    <label asp-for="City" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="City" class="form-label fw-bold text-body small"></label>
                     <input asp-for="City" class="form-control form-control-modern" placeholder="City" />
                 </div>
                 <div class="col-md-3">
-                    <label asp-for="State" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="State" class="form-label fw-bold text-body small"></label>
                     <input asp-for="State" class="form-control form-control-modern" placeholder="State" />
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="Country" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="Country" class="form-label fw-bold text-body small"></label>
                     <input asp-for="Country" class="form-control form-control-modern" placeholder="Country" />
                 </div>
                 <div class="col-md-6">
-                    <label asp-for="PostalCode" class="form-label fw-bold text-dark small"></label>
+                    <label asp-for="PostalCode" class="form-label fw-bold text-body small"></label>
                     <input asp-for="PostalCode" class="form-control form-control-modern" placeholder="Postal / Zip Code" />
                 </div>
 
                 <div class="col-md-6 mt-3">
                     <div class="form-check form-switch">
                         <input asp-for="IsProfilePublic" class="form-check-input" type="checkbox" role="switch" />
-                        <label asp-for="IsProfilePublic" class="form-check-label fw-bold text-dark small">Public Profile Visibility</label>
+                        <label asp-for="IsProfilePublic" class="form-check-label fw-bold text-body small">Public Profile Visibility</label>
                         <div class="text-muted" style="font-size: 0.78rem;">Allow team members to discover your profile and skills.</div>
                     </div>
                 </div>
                 <div class="col-md-6 mt-3">
                     <div class="form-check form-switch">
                         <input asp-for="EmailNotifications" class="form-check-input" type="checkbox" role="switch" />
-                        <label asp-for="EmailNotifications" class="form-check-label fw-bold text-dark small">Security & Update Emails</label>
+                        <label asp-for="EmailNotifications" class="form-check-label fw-bold text-body small">Security & Update Emails</label>
                         <div class="text-muted" style="font-size: 0.78rem;">Receive critical login alerts and updates.</div>
                     </div>
                 </div>
@@ -212,5 +264,55 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        // Interactive Skills Tag Manager
+        const skillsHiddenInput = document.getElementById('hiddenSkillsInput');
+        const skillInputField = document.getElementById('skillInputField');
+        const container = document.getElementById('skillsTagContainer');
+
+        let skillsList = [];
+        const initialVal = skillsHiddenInput.value;
+        if (initialVal) {
+            skillsList = initialVal.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        function renderSkills() {
+            // Remove existing tag elements
+            document.querySelectorAll('.skill-tag-editable').forEach(el => el.remove());
+
+            skillsList.forEach((skill, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'skill-tag-editable';
+                tag.innerHTML = `<span>${skill}</span> <i class="bi bi-x-circle-fill btn-close-tag" onclick="removeSkill(${index});"></i>`;
+                container.insertBefore(tag, skillInputField);
+            });
+
+            skillsHiddenInput.value = skillsList.join(', ');
+        }
+
+        function addSkill(skillText) {
+            const trimmed = skillText.trim();
+            if (trimmed && !skillsList.includes(trimmed)) {
+                skillsList.push(trimmed);
+                renderSkills();
+            }
+            skillInputField.value = '';
+        }
+
+        function removeSkill(index) {
+            skillsList.splice(index, 1);
+            renderSkills();
+        }
+
+        skillInputField.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addSkill(this.value);
+            } else if (e.key === 'Backspace' && this.value === '' && skillsList.length > 0) {
+                removeSkill(skillsList.length - 1);
+            }
+        });
+
+        renderSkills();
     </script>
 }
