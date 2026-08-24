@@ -7,6 +7,8 @@ obj/
 *.userosscache
 *.sln.docstates
 appsettings.Development.json
+~$*
+*.tmp
 
 ## Uploaded Files (Optional)
 wwwroot/uploads/profiles/*
