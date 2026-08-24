@@ -1,6 +1,9 @@
 -- ============================================================================
 -- Script: 03_seed_data.sql
 -- Description: Realistic production-like seed data with activities and sessions.
+-- Passwords:
+--   shahil@intern.com -> User@123  (SHA256: 3e7c19576488862816f13b512cacf3e4ba97dd97243ea0bd6a2ad1642d86ba72)
+--   admin@yuva.com    -> Admin@123 (SHA256: e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7)
 -- Author: Shahil (ASP.NET Core MVC Enterprise Profile Module)
 -- ============================================================================
 
@@ -11,7 +14,7 @@ GO
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'shahil@intern.com')
 BEGIN
     INSERT INTO [dbo].[Users] ([Username], [Email], [PasswordHash], [Role], [IsActive], [TwoFactorEnabled], [CreatedAt], [LastLoginAt], [LastLoginIp])
-    VALUES ('shahil', 'shahil@intern.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', 'User', 1, 1, DATEADD(DAY, -15, SYSUTCDATETIME()), SYSUTCDATETIME(), '192.168.1.105');
+    VALUES ('shahil', 'shahil@intern.com', '3e7c19576488862816f13b512cacf3e4ba97dd97243ea0bd6a2ad1642d86ba72', 'User', 1, 1, DATEADD(DAY, -15, SYSUTCDATETIME()), SYSUTCDATETIME(), '192.168.1.105');
 
     DECLARE @ShahilId INT = SCOPE_IDENTITY();
 
@@ -48,13 +51,19 @@ BEGIN
         (@ShahilId, 'iPhone 15 Pro (Mobile)', 'Safari 18.0 (iOS)', '103.212.144.12', 'Ahmedabad, India', DATEADD(HOUR, -5, SYSUTCDATETIME()), 0),
         (@ShahilId, 'MacBook Air M2 (Laptop)', 'Brave Browser', '103.212.144.18', 'Gandhinagar, India', DATEADD(DAY, -2, SYSUTCDATETIME()), 0);
 END
+ELSE
+BEGIN
+    UPDATE [dbo].[Users]
+    SET [PasswordHash] = '3e7c19576488862816f13b512cacf3e4ba97dd97243ea0bd6a2ad1642d86ba72'
+    WHERE [Email] = 'shahil@intern.com';
+END
 GO
 
 -- 2. Seed Admin Profile
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Users] WHERE [Email] = 'admin@yuva.com')
 BEGIN
     INSERT INTO [dbo].[Users] ([Username], [Email], [PasswordHash], [Role], [IsActive], [TwoFactorEnabled], [CreatedAt], [LastLoginAt], [LastLoginIp])
-    VALUES ('admin', 'admin@yuva.com', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Admin', 1, 1, DATEADD(DAY, -60, SYSUTCDATETIME()), SYSUTCDATETIME(), '127.0.0.1');
+    VALUES ('admin', 'admin@yuva.com', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', 'Admin', 1, 1, DATEADD(DAY, -60, SYSUTCDATETIME()), SYSUTCDATETIME(), '127.0.0.1');
 
     DECLARE @AdminId INT = SCOPE_IDENTITY();
 
@@ -75,5 +84,11 @@ BEGIN
         'System Architecture, Cloud Security, DevOps, SQL Tuning, .NET Core, Microservices',
         '(GMT+05:30) India Standard Time', 'English (US)', 100, 1, 1, SYSUTCDATETIME()
     );
+END
+ELSE
+BEGIN
+    UPDATE [dbo].[Users]
+    SET [PasswordHash] = 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7'
+    WHERE [Email] = 'admin@yuva.com';
 END
 GO
