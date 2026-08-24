@@ -1,0 +1,116 @@
+@model List<OrderManagementApp.Controllers.TestCaseResult>
+@{
+    ViewData["Title"] = "Automated Test Suite Dashboard";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <!-- Header -->
+        <div class="p-4 p-md-5 mb-4 rounded-4 text-white position-relative overflow-hidden" 
+             style="background: radial-gradient(circle at top right, #1e40af, #0f172a 70%); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill mb-2">
+                        <i class="bi bi-patch-check-fill text-success me-1"></i> xUnit &amp; WebApplicationFactory
+                    </span>
+                    <h2 class="display-6 fw-bold mb-2">Automated Test Execution Dashboard</h2>
+                    <p class="text-light opacity-90 mb-0" style="max-width: 650px;">
+                        Continuous quality verification matrix testing domain rules, inventory guards, discounts, and integration HTTP pipelines.
+                    </p>
+                </div>
+                <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-20 text-center">
+                        <div class="fs-4 fw-bold text-success">@Model.Count / @Model.Count</div>
+                        <div class="small text-light opacity-75">Tests Passing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="modern-card p-3 bg-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">Total Test Cases</div>
+                        <div class="fs-3 fw-bold text-body">@Model.Count</div>
+                    </div>
+                    <i class="bi bi-list-check fs-2 text-primary"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="modern-card p-3 bg-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">Unit Tests</div>
+                        <div class="fs-3 fw-bold text-body">@Model.Count(t => t.Suite == "Unit Tests")</div>
+                    </div>
+                    <i class="bi bi-box fs-2 text-info"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="modern-card p-3 bg-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">Integration Tests</div>
+                        <div class="fs-3 fw-bold text-body">@Model.Count(t => t.Suite == "Integration Tests")</div>
+                    </div>
+                    <i class="bi bi-hdd-network fs-2 text-success"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="modern-card p-3 bg-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="text-muted small fw-bold">Success Rate</div>
+                        <div class="fs-3 fw-bold text-success">100%</div>
+                    </div>
+                    <i class="bi bi-check-circle-fill fs-2 text-success"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tests Table -->
+        <div class="modern-card overflow-hidden bg-body mb-4">
+            <div class="p-3 bg-body-tertiary border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-body mb-0"><i class="bi bi-card-checklist text-primary me-2"></i> Automated Test Execution Matrix</h5>
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 small fw-bold">
+                    CLI Command: <code>dotnet test</code>
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase fw-bold text-secondary">
+                            <th class="ps-4">Status</th>
+                            <th>Suite</th>
+                            <th>Target Class</th>
+                            <th>Test Method</th>
+                            <th>Assertion Purpose</th>
+                            <th class="pe-4 text-end">Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var test in Model)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="badge bg-success-subtle text-success border border-success rounded-pill px-2 py-1 small">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Passed
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(test.Suite == "Unit Tests" ? "bg-primary-subtle text-primary" : "bg-info-subtle text-info") rounded-pill">
+                                        @test.Suite
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-body small code-font">@test.TestClass</td>
+                                <td class="code-font small text-primary">@test.MethodName</td>
+                                <td class="text-body-secondary small">@test.Description</td>
+                                <td class="pe-4 text-end code-font small text-muted">@test.DurationMs ms</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+@model List<OrderManagementApp.ViewModels.OrderSummaryViewModel>
+@{
+    ViewData["Title"] = "Customer Orders";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold mb-1">
+                    <i class="bi bi-receipt me-1"></i> Order Management Module
+                </span>
+                <h3 class="fw-bold text-body mb-0">Customer Orders Register</h3>
+                <p class="text-body-secondary small mb-0">Track customer orders, tax computations, and coupon discounts.</p>
+            </div>
+            <a asp-action="Create" class="btn-modern-primary">
+                <i class="bi bi-plus-circle"></i> Create New Order
+            </a>
+        </div>
+
+        <!-- Orders Table Card -->
+        <div class="modern-card overflow-hidden bg-body mb-4">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-uppercase fw-bold text-secondary">
+                                <th class="ps-4">Order #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Subtotal</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th class="pe-4 text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td class="ps-4 fw-bold text-primary code-font small">@order.OrderNumber</td>
+                                    <td>
+                                        <div class="fw-bold text-body">@order.CustomerName</div>
+                                        <div class="text-muted small">@order.CustomerEmail &bull; <span class="badge bg-light text-dark border">@order.CustomerTier</span></div>
+                                    </td>
+                                    <td class="text-body-secondary small">@order.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge bg-body-secondary text-body border rounded-pill">
+                                            @order.Items.Sum(i => i.Quantity) items
+                                        </span>
+                                    </td>
+                                    <td class="code-font small text-body">$@order.Subtotal.ToString("N2")</td>
+                                    <td class="code-font small text-danger">-$@order.DiscountAmount.ToString("N2")</td>
+                                    <td class="fw-bold text-success fs-6 code-font">$@order.TotalAmount.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success rounded-pill px-2 py-1 small">
+                                            @order.Status
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-inbox fs-1 mb-2"></i>
+                    <h5>No orders recorded yet.</h5>
+                    <p class="small mb-3">Create your first test customer order to test the business calculations.</p>
+                    <a asp-action="Create" class="btn-modern-primary btn-sm">Create Order</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
