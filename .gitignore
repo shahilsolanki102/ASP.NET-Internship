@@ -1,6 +1,8 @@
 ## Build and IDE Artifacts
 bin/
 obj/
+publish/
+TestResults/
 .vs/
 *.user
 *.suo
@@ -9,6 +11,7 @@ obj/
 appsettings.Development.json
 ~$*
 *.tmp
+*.zip
 
 ## Uploaded Files (Optional)
 wwwroot/uploads/profiles/*
