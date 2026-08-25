@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # 1. ASP.NET Core Web Application Service
+  # ===========================================================================
+  app:
+    build:
+      context: ../..
+      dockerfile: Week-4/deployment/Dockerfile
+    container_name: orderflow_app
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=db;Database=OrderManagementDb;User Id=sa;Password=YourStrong@Password2026!;TrustServerCertificate=True;MultipleActiveResultSets=true;
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend_network
+
+  # ===========================================================================
+  # 2. Microsoft SQL Server 2022 Linux Database Service
+  # ===========================================================================
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: orderflow_sqldb
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Password2026!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Password2026!' -Q 'SELECT 1' -C || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - backend_network
+
+  # ===========================================================================
+  # 3. Nginx Reverse Proxy & Load Balancer
+  # ===========================================================================
+  proxy:
+    image: nginx:alpine
+    container_name: orderflow_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - backend_network
+
+networks:
+  backend_network:
+    driver: bridge
+
+volumes:
+  sqldata:
+    driver: local

@@ -1,0 +1,119 @@
+name: ASP.NET Core CI/CD Enterprise Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  # ===========================================================================
+  # JOB 1: Continuous Integration - Build, Code Quality & Test Automation
+  # ===========================================================================
+  build-and-test:
+    name: 🧪 Build & Automated Test Suite Gate
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Repository Source Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: ⚙️ Setup .NET Core 9.0 SDK Environment
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Restore Dependencies (Week 1, Week 2, Week 3)
+      run: |
+        dotnet restore "Week-1_UserProfileManagement/UserProfileManagement.sln"
+        dotnet restore "Week-2/PerformanceOptimization.sln"
+        dotnet restore "Week-3/OrderManagementSuite.sln"
+
+    - name: 🔨 Compile & Build Entire Solution
+      run: |
+        dotnet build "Week-1_UserProfileManagement/UserProfileManagement.sln" --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        dotnet build "Week-2/PerformanceOptimization.sln" --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+        dotnet build "Week-3/OrderManagementSuite.sln" --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+    - name: 🔬 Execute Automated Unit & Integration Tests
+      run: |
+        dotnet test "Week-3/OrderManagementSuite.sln" \
+          --configuration ${{ env.BUILD_CONFIGURATION }} \
+          --no-build \
+          --verbosity normal \
+          --collect:"XPlat Code Coverage" \
+          --results-directory ./TestResults
+
+    - name: 📊 Upload Test Results & Code Coverage Artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-coverage
+        path: ./TestResults
+        retention-days: 14
+
+  # ===========================================================================
+  # JOB 2: Docker Image Build & Container Verification
+  # ===========================================================================
+  docker-build:
+    name: 🐳 Docker Multi-Stage Container Build
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: 🛠️ Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: 🏗️ Build Multi-Stage Docker Image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Week-4/deployment/Dockerfile
+        push: false
+        tags: |
+          orderflow-app:latest
+          orderflow-app:${{ github.sha }}
+
+  # ===========================================================================
+  # JOB 3: Continuous Deployment - Production Packaging & Release Artifacts
+  # ===========================================================================
+  publish-and-package:
+    name: 🚀 Production Publish & Artifact Distribution
+    needs: [build-and-test, docker-build]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup .NET 9.0 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 📦 Publish ASP.NET Core Release Binaries
+      run: |
+        dotnet publish "Week-1_UserProfileManagement/src/UserProfileApp/UserProfileApp.csproj" -c Release -o ./publish/UserProfileApp
+        dotnet publish "Week-2/src/PerformanceOptimizationApp/PerformanceOptimizationApp.csproj" -c Release -o ./publish/PerformanceOptimizationApp
+        dotnet publish "Week-3/src/OrderManagementApp/OrderManagementApp.csproj" -c Release -o ./publish/OrderManagementApp
+
+    - name: 🗜️ Archive Production Deployment Package
+      run: |
+        cd publish && zip -r ../production-release-bundle.zip .
+
+    - name: 📤 Upload Production Release Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-release-bundle
+        path: production-release-bundle.zip
+        retention-days: 30

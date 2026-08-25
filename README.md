@@ -1,75 +1,45 @@
-# ASP.NET Web Development Internship Projects
-**Platform**: Yuva Intern / NSDC  
-**Intern**: Shahil  
-**Technology Stack**: ASP.NET Core 9.0 MVC, Entity Framework Core 9, Microsoft SQL Server, Bootstrap 5  
+# ASP.NET Core Enterprise Internship & Engineering Portfolio
+
+Welcome to the comprehensive 4-Week ASP.NET Core & DevOps Internship repository developed by **Shahil** (Yuva Intern / NSDC Track).
 
 ---
 
-## 📁 Repository Structure
+## 🌟 4-Week Curriculum & Deliverable Overview
 
-```text
-ASP.NET-Internship/
-│
-├── Week-1_UserProfileManagement/
-│   ├── src/
-│   │   └── UserProfileApp/               # ASP.NET Core 9.0 MVC Web Application
-│   │       ├── Controllers/              # ProfileController, AccountController, HomeController
-│   │       ├── Data/                     # ApplicationDbContext (EF Core)
-│   │       ├── Models/                   # User, UserProfile
-│   │       ├── ViewModels/               # DTOs & Form ViewModels
-│   │       ├── Services/                 # ProfileService, AuthService, PasswordHelper
-│   │       ├── Views/                    # Razor Views (Profile, Account, Home, Shared)
-│   │       └── wwwroot/                  # Static assets & profile avatar uploads
-│   ├── database/
-│   │   ├── 01_create_database_and_tables.sql   # Database, Tables, Constraints & Indexes
-│   │   ├── 02_stored_procedures.sql            # Stored Procedures for CRUD & Transactions
-│   │   └── 03_seed_data.sql                    # Initial Demo Users & Profiles
-│   └── docs/
-│       ├── Design_Document_UserProfileModule.md # Comprehensive Technical Design Document
-│       ├── Internship_Report_Week1.docx         # Formal Word Report (.docx)
-│       └── Portal_Submission_Text.md            # 200+ Words Portal Description Text
-│
-├── Week-2/                               # Upcoming Week 2 Task
-├── Week-3/                               # Upcoming Week 3 Task
-└── Week-4/                               # Upcoming Week 4 Task
-```
+| Milestone | Project Title | Key Technologies | Status | Links & Artifacts |
+|---|---|---|---|---|
+| **Week 1** | **ASP.NET Core SaaS User Profile Module** | ASP.NET Core 9.0 MVC, EF Core, SQL Server, Auth Cookies, SHA-256, 2FA, Dark/Light Mode, SweetAlert2 | ✅ Complete | [Explore Week 1](Week-1_UserProfileManagement/) &bull; [Report Docx](Week-1_UserProfileManagement/docs/Internship_Report_Week1.docx) |
+| **Week 2** | **Code Debugging, Refactoring & Performance Tuning** | N+1 Query Resolution, B-Tree Indexes, IMemoryCache, AsNoTracking, Server-Side Pagination, Benchmark Engine | ✅ Complete | [Explore Week 2](Week-2/) &bull; [Report Docx](Week-2/docs/Performance_Optimization_Report_Week2.docx) |
+| **Week 3** | **Automated Unit & Integration Testing Suite** | xUnit, Moq, FluentAssertions, WebApplicationFactory, 26/26 Tests Passed (100%), In-App Test Dashboard | ✅ Complete | [Explore Week 3](Week-3/) &bull; [Report Docx](Week-3/docs/Automated_Testing_Report_Week3.docx) |
+| **Week 4** | **Documentation, Deployment & DevOps Integration** | GitHub Actions CI/CD, Multi-Stage Dockerfile, Docker Compose, Nginx Proxy, Automated PowerShell Deploy | ✅ Complete | [Explore Week 4](Week-4/) &bull; [Report Docx](Week-4/docs/DevOps_and_Deployment_Report_Week4.docx) |
 
 ---
 
-## 🚀 Week 1: User Profile Management Module
+## 🛠️ Global Technology Stack
 
-### ✨ Features Implemented
-1. **User Profile View**: Clean, card-based interface displaying personal details, bio, contact information, address, and account timestamps.
-2. **Profile Editing & Photo Upload**: Interactive form with live avatar preview, secure file uploading (JPG, PNG, WebP with size capping and GUID sanitization).
-3. **Account Security**: SHA-256 password hashing and password change capability.
-4. **Authentication & Authorization**: Cookie-based authentication with role claims and protected routes.
-5. **Database Architecture**: SQL Server relational schema with primary/foreign keys, cascade actions, indexes on `Email` & `PhoneNumber`, and stored procedures.
-6. **Responsive UI**: Built with Bootstrap 5 and Bootstrap Icons for seamless desktop and mobile viewports.
+- **Framework**: .NET 9.0 (ASP.NET Core 9.0 MVC)
+- **Database**: Microsoft SQL Server 2022 (`localhost\SQLEXPRESS` & Docker Linux Container)
+- **ORM & Data Access**: Entity Framework Core 9.0.2 with SQL Server & In-Memory Providers
+- **Testing & Mocking**: xUnit 2.9.2, Moq 4.20.72, FluentAssertions 6.12.2, `Microsoft.AspNetCore.Mvc.Testing`
+- **DevOps & Containerization**: GitHub Actions (.github/workflows/ci-cd.yml), Docker, Docker Compose, Nginx
+- **Frontend & UI**: Bootstrap 5.3.3, Bootstrap Icons, Chart.js, SweetAlert2, Glassmorphism Modern Theme
 
 ---
 
-## 🛠️ Quick Start & Local Setup
+## 🚀 Quick Start Guide
 
-### 1. Database Setup
-Execute the SQL scripts in SQL Server Management Studio (SSMS) or via `sqlcmd`:
+### 1. Automated Test Execution across Solutions
 ```bash
-sqlcmd -S "localhost\SQLEXPRESS" -E -i "Week-1_UserProfileManagement\database\01_create_database_and_tables.sql"
-sqlcmd -S "localhost\SQLEXPRESS" -E -i "Week-1_UserProfileManagement\database\02_stored_procedures.sql"
-sqlcmd -S "localhost\SQLEXPRESS" -E -i "Week-1_UserProfileManagement\database\03_seed_data.sql"
+dotnet test "Week-3/OrderManagementSuite.sln"
 ```
 
-### 2. Run ASP.NET Core Application
+### 2. Automated Production Build & Package
+```powershell
+powershell -ExecutionPolicy Bypass -File "Week-4\deployment\deploy.ps1"
+```
+
+### 3. Docker Compose Orchestration
 ```bash
-cd "Week-1_UserProfileManagement\src\UserProfileApp"
-dotnet restore
-dotnet run
+cd "Week-4/deployment"
+docker-compose up -d --build
 ```
-Open your browser and navigate to: `https://localhost:5001` or `http://localhost:5000`
-
-### 3. Demo Credentials
-- **Intern Demo**:
-  - Email: `shahil@intern.com`
-  - Password: `User@123`
-- **Admin Demo**:
-  - Email: `admin@yuva.com`
-  - Password: `Admin@123`
